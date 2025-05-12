@@ -1,15 +1,27 @@
 #!/bin/bash
 
+export CATALOG_URL="http://localhost:25020/catalog_object?json&object_type=DATABASE&object_name="
+export CURL="curl -s"
+export DB_PREFIX=hive_created_db
+
 procuder() {
-  $IMPALA_EXEC "drop database if exists db1; drop database if exists db2; drop database if exists db3"
-  $HIVE_EXEC "create database db1; create database db2; create database db3"
+  SQL=""
+  for i in {1..3}; do
+    SQL="$SQL drop database if exists ${DB_PREFIX}${i};"
+  done
+  $IMPALA_EXEC "$SQL"
+  SQL=""
+  for i in {1..3}; do
+    SQL="$SQL create database ${DB_PREFIX}${i};"
+  done
+  $HIVE_EXEC "$SQL"
 }
 
-consumer_verified() {
+consumer_verified_old() {
   dbs=$($IMPALA_EXEC "show databases")
   for i in {1..3}; do
-    if ! grep -q "^db$i"$'\t' <<< "$dbs"; then
-      echo "[$(date '+%Y-%m-%d %H:%M:%S')] db$i not found"
+    if ! grep -q "^${DB_PREFIX}${i}"$'\t' <<< "$dbs"; then
+      echo "$(get_ts) ${DB_PREFIX}${i} not found"
       return 1
     fi
     echo "Found db$i"
@@ -17,3 +29,12 @@ consumer_verified() {
   return 0
 }
 
+consumer_verified() {
+  for i in {1..3}; do
+    if ! $CURL "${CATALOG_URL}${DB_PREFIX}${i}" | jq -e ".json_string" > /dev/null; then
+      echo "$(get_ts) ${DB_PREFIX}${i} not found"
+      return 1
+    fi
+    echo "$(get_ts) Found ${DB_PREFIX}${i}"
+  done
+}
