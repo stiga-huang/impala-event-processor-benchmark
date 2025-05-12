@@ -35,10 +35,14 @@ consumer_verified_old() {
 
 consumer_verified() {
   for i in `seq $NUM_DBS`; do
-    if ! $CURL "'${CATALOG_URL}${DB_PREFIX}${i}'" | jq -e ".json_string" > /dev/null; then
+    set -x
+    if ! $CURL "${CATALOG_URL}${DB_PREFIX}${i}" | jq -e ".json_string"; then
+      set +x
       echo "$(get_ts) ${DB_PREFIX}${i} not found"
+      sleep 0.01
       return 1
     fi
+    set +x
     echo "$(get_ts) Found ${DB_PREFIX}${i}"
   done
 }

@@ -36,10 +36,14 @@ consumer_verified_old() {
 consumer_verified() {
   for i in `seq $NUM_TABLES`; do
     TBL_NAME="${TBL_NAME_PREFIX}_${i}"
-    if ! $CURL "'${CATALOG_URL}${TBL_NAME}'" | jq -e ".json_string" > /dev/null; then
+    set -x
+    if ! $CURL "${CATALOG_URL}${TBL_NAME}" | jq -e ".json_string"; then
+      set +x
       echo "$(get_ts) ${TBL_NAME} not found"
+      sleep 0.01
       return 1
     fi
+    set +x
     echo "$(get_ts) Found ${TBL_NAME}"
   done
 }

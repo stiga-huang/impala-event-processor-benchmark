@@ -1,19 +1,48 @@
 #!/bin/bash
 
+export CATALOG_URL="http://localhost:25020/catalog_object?json&object_type=DATABASE&object_name="
+export CURL="curl -s"
+#export CATALOG_URL="https://vb1404.halxg.cloudera.com:25020/catalog_object?json&object_type=DATABASE&object_name="
+#export CURL="curl -s --cacert /var/lib/cloudera-scm-agent/agent-cert/cm-auto-global_cacerts.pem --negotiate -u : "
+
+export DB_PREFIX="hive_drop_db_$(uuidgen | cut -c 1-8)"
+export NUM_DBS=1
+
 procuder() {
-  $IMPALA_EXEC "create database if not exists db1; create database if not exists db2; create database if not exists db3"
-  $HIVE_EXEC "drop database db1; drop database db2; drop database db3"
+  SQL=""
+  for i in `seq $NUM_DBS`; do
+    SQL="$SQL create database if not exists ${DB_PREFIX}${i};"
+  done
+  $IMPALA_EXEC "$SQL"
+  SQL=""
+  for i in `seq $NUM_DBS`; do
+    SQL="$SQL drop database ${DB_PREFIX}${i};"
+  done
+  $HIVE_EXEC "$SQL"
 }
 
-consumer_verified() {
+consumer_verified_old() {
   dbs=$($IMPALA_EXEC "show databases")
-  for i in {1..3}; do
-    if grep -q "^db$i"$'\t' <<< "$dbs"; then
-      echo "[$(date '+%Y-%m-%d %H:%M:%S')] db$i still exists"
+  for i in `seq $NUM_DBS`; do
+    if grep -q "^${DB_PREFIX}$i"$'\t' <<< "$dbs"; then
+      echo "$(get_ts) db$i still exists"
       return 1
     fi
-    echo "Removed db$i"
+    echo "$(get_ts) Removed db$i"
   done
   return 0
 }
 
+consumer_verified() {
+  for i in `seq $NUM_DBS`; do
+    set -x
+    if $CURL "${CATALOG_URL}${DB_PREFIX}${i}" | jq -e ".json_string"; then
+      set +x
+      echo "$(get_ts) ${DB_PREFIX}${i} still exists"
+      sleep 0.01
+      return 1
+    fi
+    set +x
+    echo "$(get_ts) Removed ${DB_PREFIX}${i}"
+  done
+}

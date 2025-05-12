@@ -1,13 +1,16 @@
 #!/bin/bash
 
 # Hive CREATE db/table tests
+# Keeps generating CREATE/DROP events
 for i in `seq 10`; do
-  ./run.sh tests/hive_create_db.sh > create_db_$i.log 2>&1 &
-  ./run.sh tests/hive_create_table.sh > create_tbl_$i.log 2>&1 &
+  for j in `seq 8`; do ./run.sh tests/hive_create_db.sh; sleep 1; done > create_db_$i.log 2>&1 &
+  for j in `seq 8`; do ./run.sh tests/hive_create_table.sh; sleep 1; done > create_tbl_$i.log 2>&1 &
+  for j in `seq 8`; do ./run.sh tests/hive_drop_db.sh; sleep 1; done > drop_db_$i.log 2>&1 &
+  for j in `seq 8`; do ./run.sh tests/hive_drop_table.sh; sleep 1; done > drop_tbl_$i.log 2>&1 &
 done
 
 # Hive INSERT tests
-rm tbl*.log
+rm -f tbl*.log
 
 for i in {1..5}; do
   ./run.sh tests/hive_insert_static_new_part.sh tbl$i >> tbl${i}.log 2>&1 && ./run.sh tests/hive_insert_static_existing_part.sh tbl$i >> tbl${i}.log 2>&1 && ./run.sh tests/hive_insert_dynamic_new_part.sh tbl$i >> tbl${i}.log 2>&1 &
@@ -15,6 +18,6 @@ done
 
 wait
 
-grep -h '>>>>>>>>>>' create_*.log tbl*.log | sort
+grep -h '>>>>>>>>>>' create*.log drop*.log tbl*.log | sort
 
 stty sane
