@@ -9,6 +9,10 @@ set -e
 HIVE_EXEC="beeline -u jdbc:hive2://localhost:11050 -e"
 IMPALA_EXEC="impala-shell.sh -B --quiet -q"
 
+cleanup() {
+  : # No-op by default
+}
+
 source $1
 
 get_ts() {
@@ -27,4 +31,8 @@ done
 end_time=$(date +%s.%3N)
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] Synced $end_time"
 duration=$(echo "$end_time - $start_time" | bc)
+echo
 echo "$1>>>>>>>>>>$duration"
+echo
+
+cleanup
