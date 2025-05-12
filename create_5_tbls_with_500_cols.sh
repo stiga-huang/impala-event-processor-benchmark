@@ -9,6 +9,8 @@ IMPALA_SHELL=impala-shell.sh
 #IMPALA_SHELL=impala-shell
 
 # 20 data types
+# Currently don't have BOOLEAN, TIMESTAMP and DATE since 500_cols.parq is converted
+# from a text file using 0 as all columns.
 DATA_TYPES=(
   "BIGINT"
   "INT"

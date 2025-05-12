@@ -1,21 +1,25 @@
 #!/bin/bash
 
-DB=scale_400k_500cols_db
+DB=scale_4k_500cols_db
+
+COLS="col0"
+for i in {1..499}; do
+  COLS="$COLS,col$i"
+done
 
 procuder() {
+  echo "$(get_ts) Impala> Dropping partition p=500000"
   $IMPALA_EXEC "alter table $DB.tbl1 drop if exists partition(p=500000)"
-  SQL="set hive.stats.autogather=false; insert into $DB.tbl1 partition(p=500000) select col0"
-  for i in {1..499}; do
-    SQL="$SQL,col$i"
-  done
-  SQL="$SQL from $DB.tbl3 where p=0"
+  echo "$(get_ts) Hive> Adding the new partition by INSERT"
+  SQL="set hive.stats.autogather=false; insert into $DB.tbl1 partition(p=500000) select $COLS from $DB.tbl3 where p=0"
   $HIVE_EXEC "$SQL"
 }
 
 consumer_verified() {
   #TODO: This statement takes 5s where most of the time spent in query planning (4.59s)
   # when the table has 400K partitions. Try to find a more lightweight verifier.
-  # Consider SHOW PARTITIONS with WHERE clause (IMPALA-14065).
+  # Consider SHOW PARTITIONS with WHERE clause (IMPALA-14065) or checking the partition
+  # in catalogd WebUI (IMPALA-9935).
   row_count=$($IMPALA_EXEC "select count(*) from $DB.tbl1 where p=500000")
   if [ $row_count -eq 0 ]; then
     echo "$(get_ts) New partition not found"
