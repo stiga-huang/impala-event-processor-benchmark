@@ -9,11 +9,23 @@ Baseline is using the solution without EventProcessor, i.e.
 * Starting catalogd with --hms_event_polling_interval_s=0,
 * Using REFRESH/INVALIDATE in the consumers.
 
-Transactional tables are not tested for simplicity.
+Notes:
+* Transactional tables are not tested for simplicity.
+* Tables should be in the loaded state in Impala so the external modification makes the metadata stale.
+* Consumers could be slow which adds into the delay. Try using lightweight consumers like checking /catalog WebUI of catalogd.
 
 ## Scale Factors
 * Number of dbs/tables/partitions/columns/files
 * File size doesn’t matter unless the storage splits the file, e.g. when using HDFS and the file size is larger than the HDFS block size. We only test files smaller than the block size since this is more common in reality.
+
+## Data Generation
+Edit variables in `create_5_tbls_with_500_cols.sh`. Use it to create partitioned tables with 500 columns.
+`create_hive_part_dirs.sh` creates the partition dirs on HDFS for the first table. You will need
+to manually mirror data to the other tables based on the output.
+```bash
+bash create_5_tbls_with_500_cols.sh
+bash create_hive_part_dirs.sh
+```
 
 ## Benchmark Scenarios
 These are common scenarios in daily/weekly jobs.
@@ -36,7 +48,7 @@ These are common scenarios in daily/weekly jobs.
 
 ## Usage
 
-Edit tests/run.sh to update the beeline and impala-shell commands.
+Edit tests/run.sh to update the beeline and impala-shell commands. Edit variables in each test.
 Run a test case by
 ```bash
 ./run.sh test_script
@@ -44,6 +56,10 @@ Run a test case by
 For instance
 ```bash
 ./run.sh tests/hive_create_db.sh
+```
+Run tests in parallel.
+```bash
+./parallel_run.sh
 ```
 
 ## Development

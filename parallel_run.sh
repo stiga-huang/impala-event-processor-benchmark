@@ -20,4 +20,5 @@ wait
 
 grep -h '>>>>>>>>>>' create*.log drop*.log tbl*.log | sort
 
+# Somehow the terminal is messed up. Recover it anyway.
 stty sane
