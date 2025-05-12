@@ -14,25 +14,27 @@ cleanup() {
 }
 
 source $1
+TEST_CASE=$1
+shift
 
 get_ts() {
   date '+%Y-%m-%d %H:%M:%S'
 }
 
-procuder
+procuder $@
 
 start_time=$(date +%s.%3N)
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] Procuder done $start_time"
 
-while ! consumer_verified; do
+while ! consumer_verified $@; do
   :
 done
 
 end_time=$(date +%s.%3N)
-echo "[$(date '+%Y-%m-%d %H:%M:%S')] Synced $end_time"
+echo "$(get_ts) Synced $end_time"
 duration=$(echo "$end_time - $start_time" | bc)
 echo
-echo "$1>>>>>>>>>>$duration"
+echo "$TEST_CASE>>>>>>>>>>$duration"
 echo
 
-cleanup
+cleanup $@
