@@ -6,7 +6,7 @@ Measure the delay of external changes arriving in Impala. Each scenario has a pr
 * The delay (lag) is the output captured for each scenario. To be specific, it’s the time between when the producer has finished and the consumer sees the expected results.
 
 Baseline is using the solution without EventProcessor, i.e.
-* Starting catalogd with --hms_event_polling_interval_s=0,
+* Starting catalogd with `--hms_event_polling_interval_s=0`,
 * Using REFRESH/INVALIDATE in the consumers.
 
 Notes:
@@ -18,10 +18,19 @@ Notes:
 * Number of dbs/tables/partitions/columns/files
 * File size doesn’t matter unless the storage splits the file, e.g. when using HDFS and the file size is larger than the HDFS block size. We only test files smaller than the block size since this is more common in reality.
 
+## Dependencies
+* GNU parallel
+* jq - Command-line JSON processor
+
+```bash
+sudo yum install -y parallel jq
+```
+
 ## Data Generation
 Edit variables in `create_5_tbls_with_500_cols.sh`. Use it to create partitioned tables with 500 columns.
 `create_hive_part_dirs.sh` creates the partition dirs on HDFS for the first table. You will need
 to manually mirror data to the other tables based on the output.
+
 ```bash
 bash create_5_tbls_with_500_cols.sh
 bash create_hive_part_dirs.sh
