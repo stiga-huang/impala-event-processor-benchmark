@@ -9,9 +9,11 @@ done
 
 procuder() {
   TBL=${1:-tbl1}
-  echo "$(get_ts) Impala> Clearing partitions p>=400000"
-  $IMPALA_EXEC "alter table $DB.$TBL drop if exists partition(p>=400000)"
-  echo "$(get_ts) Hive> Dynamically created 200 partitions"
+  echo "$(get_ts) Hive> Clearing partitions p>=400000"
+  $HIVE_EXEC "alter table $DB.$TBL drop if exists partition(p>=400000)"
+  echo "$(get_ts) Impala> Reloading table"
+  $IMPALA_EXEC "refresh $DB.$TBL"
+  echo "$(get_ts) Hive> Dynamically creating 200 partitions"
   $HIVE_EXEC "set hive.stats.autogather=false; set hive.exec.max.dynamic.partitions.pernode=200; insert into $DB.$TBL select $COLS, p+400000 from $DB.tbl3 where p<200"
 }
 
