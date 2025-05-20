@@ -13,6 +13,14 @@ IMPALA_EXEC="impala-shell.sh -B --quiet -q"
 CURL="curl -s"
 CATALOG_URL="http://localhost:25020"
 
+DB=scale_4k_500cols_db
+
+# Column list used in statements
+COLS="col0"
+for i in {1..499}; do
+  COLS="$COLS,col$i"
+done
+
 cleanup() {
   : # No-op by default
 }

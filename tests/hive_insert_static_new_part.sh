@@ -1,12 +1,5 @@
 #!/bin/bash
 
-DB=scale_4k_500cols_db
-
-COLS="col0"
-for i in {1..499}; do
-  COLS="$COLS,col$i"
-done
-
 procuder() {
   TBL=${1:-tbl1}
   echo "$(get_ts) Impala> Dropping partition p=500000 in $DB.$TBL"

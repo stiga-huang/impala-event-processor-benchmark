@@ -13,7 +13,10 @@ done
 rm -f tbl*.log
 
 for i in {1..5}; do
-  ./run.sh tests/hive_insert_static_new_part.sh tbl$i >> tbl${i}.log 2>&1 && ./run.sh tests/hive_insert_static_existing_part.sh tbl$i >> tbl${i}.log 2>&1 && ./run.sh tests/hive_insert_dynamic_new_part.sh tbl$i >> tbl${i}.log 2>&1 &
+  ./run.sh tests/hive_insert_static_new_part.sh tbl$i >> tbl${i}.log 2>&1 \
+  && ./run.sh tests/hive_insert_static_existing_part.sh tbl$i >> tbl${i}.log 2>&1 \
+  && ./run.sh tests/hive_overwrite_static_existing_part.sh tbl$i >> tbl${i}.log 2>&1 \
+  && ./run.sh tests/hive_insert_dynamic_new_part.sh tbl$i >> tbl${i}.log 2>&1 &
 done
 
 wait
