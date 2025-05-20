@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #DB=scale_400k_500cols_db
-#DB=scale_40k_500cols_db
-DB=scale_4k_500cols_db
+DB=scale_40k_500cols_db
+#DB=scale_4k_500cols_db
 NUM_TABLES=5
 TMP_SQL=tmp.sql
 IMPALA_SHELL=impala-shell.sh

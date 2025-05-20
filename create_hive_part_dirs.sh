@@ -4,10 +4,10 @@ set -e
 
 IMPALA_SHELL=impala-shell.sh
 MAX_THREADS=32
-#NUM_PARTS=40000
-#DB_PATH=hdfs://ns1/warehouse/tablespace/external/hive/scale_40k_500cols_db.db
-NUM_PARTS=4000
-DB_NAME=scale_4k_500cols_db
+NUM_PARTS=40000
+DB_NAME=scale_40k_500cols_db
+#NUM_PARTS=4000
+#DB_NAME=scale_4k_500cols_db
 TBL_NAME=tbl1
 DATA_FILE=500_cols.parq
 
