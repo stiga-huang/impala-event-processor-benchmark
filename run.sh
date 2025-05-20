@@ -4,10 +4,14 @@ set -e
 
 #HIVE_EXEC="beeline -e"
 #IMPALA_EXEC="impala-shell -d default -k --ssl --ca_cert=/var/lib/cloudera-scm-agent/agent-cert/cm-auto-global_cacerts.pem -B --quiet -q"
+#CURL="curl -s --cacert /var/lib/cloudera-scm-agent/agent-cert/cm-auto-global_cacerts.pem --negotiate -u : "
+#CATALOG_URL="https://vb1404.halxg.cloudera.com:25020"
 
 # Clients in Impala Dev Env
 HIVE_EXEC="beeline -u jdbc:hive2://localhost:11050 -e"
 IMPALA_EXEC="impala-shell.sh -B --quiet -q"
+CURL="curl -s"
+CATALOG_URL="http://localhost:25020"
 
 cleanup() {
   : # No-op by default

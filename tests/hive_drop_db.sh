@@ -1,10 +1,6 @@
 #!/bin/bash
 
-export CATALOG_URL="http://localhost:25020/catalog_object?json&object_type=DATABASE&object_name="
-export CURL="curl -s"
-#export CATALOG_URL="https://vb1404.halxg.cloudera.com:25020/catalog_object?json&object_type=DATABASE&object_name="
-#export CURL="curl -s --cacert /var/lib/cloudera-scm-agent/agent-cert/cm-auto-global_cacerts.pem --negotiate -u : "
-
+export URL_PATH="/catalog_object?json&object_type=DATABASE&object_name="
 export DB_PREFIX="hive_drop_db_$(uuidgen | cut -c 1-8)"
 export NUM_DBS=1
 
@@ -36,7 +32,7 @@ consumer_verified_old() {
 consumer_verified() {
   for i in `seq $NUM_DBS`; do
     set -x
-    if $CURL "${CATALOG_URL}${DB_PREFIX}${i}" | jq -e ".json_string"; then
+    if $CURL "${CATALOG_URL}${URL_PATH}${DB_PREFIX}${i}" | jq -e ".json_string"; then
       set +x
       echo "$(get_ts) ${DB_PREFIX}${i} still exists"
       sleep 0.01
