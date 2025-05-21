@@ -25,3 +25,14 @@ consumer_verified() {
   return 1
 }
 
+manual_refresh() {
+  TBL=${1:-tbl1}
+  SQL=""
+  for i in {200..399}; do
+    SQL="$SQL refresh $DB.$TBL partition(p=$i);"
+  done
+  for i in {400000..400199}; do
+    SQL="$SQL refresh $DB.$TBL partition(p=$i);"
+  done
+  $IMPALA_EXEC "$SQL"
+}

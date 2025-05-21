@@ -43,3 +43,10 @@ consumer_verified() {
     echo "$(get_ts) Removed ${TBL_NAME}"
   done
 }
+
+manual_refresh() {
+  for i in `seq $NUM_TABLES`; do
+    TBL_NAME="${TBL_NAME_PREFIX}_${i}"
+    $IMPALA_EXEC "invalidate metadata $TBL_NAME"
+  done
+}

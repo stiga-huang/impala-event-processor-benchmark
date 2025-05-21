@@ -43,10 +43,19 @@ consumer_verified() {
   done
 }
 
+manual_refresh() {
+  # Impala doesn't support invalidating a db. We have to create a table under it and
+  # invalidate the table instead. That will bring the db up.
+  for i in `seq $NUM_DBS`; do
+    $HIVE_EXEC "create table ${DB_PREFIX}${i}.tbl (i int)"
+    $IMPALA_EXEC "invalidate metadata ${DB_PREFIX}${i}.tbl"
+  done
+}
+
 cleanup() {
   SQL=""
   for i in `seq $NUM_DBS`; do
-    SQL="$SQL drop database if exists ${DB_PREFIX}${i};"
+    SQL="$SQL drop database if exists ${DB_PREFIX}${i} cascade;"
   done
   $HIVE_EXEC "$SQL"
 }

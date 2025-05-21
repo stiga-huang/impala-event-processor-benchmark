@@ -14,6 +14,7 @@ CURL="curl -s"
 CATALOG_URL="http://localhost:25020"
 
 DB=scale_4k_500cols_db
+MANUAL_REFRESH=${MANUAL_REFRESH:-false}
 
 # Column list used in statements
 COLS="col0"
@@ -36,7 +37,12 @@ get_ts() {
 procuder $@
 
 start_time=$(date +%s.%3N)
-echo "[$(date '+%Y-%m-%d %H:%M:%S')] Procuder done $start_time"
+echo "$(get_ts) Procuder done $start_time"
+
+if [[ "$MANUAL_REFRESH" == "true" ]]; then
+  manual_refresh $@
+  echo "$(get_ts) Manual refresh finished"
+fi
 
 while ! consumer_verified $@; do
   :

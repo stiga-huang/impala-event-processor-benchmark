@@ -24,3 +24,7 @@ consumer_verified() {
   return 0
 }
 
+manual_refresh() {
+  TBL=${1:-tbl1}
+  $IMPALA_EXEC "refresh $DB.$TBL partition (p=500000)"
+}

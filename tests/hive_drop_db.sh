@@ -29,6 +29,12 @@ consumer_verified_old() {
   return 0
 }
 
+manual_refresh() {
+  # Impala doesn't support invalidating a db. Since the db has been dropped, we can only
+  # use global invalidate.
+  $IMPALA_EXEC "invalidate metadata"
+}
+
 consumer_verified() {
   for i in `seq $NUM_DBS`; do
     set -x
