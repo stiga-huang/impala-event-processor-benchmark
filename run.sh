@@ -2,6 +2,11 @@
 
 set -e
 
+# Clients in a remote cluster
+#HIVE_EXEC="beeline -n impala -pabc -e"
+#IMPALA_EXEC="impala-shell -B --quiet -q"
+
+# Clients in a secured cluster
 #HIVE_EXEC="beeline -e"
 #IMPALA_EXEC="impala-shell -d default -k --ssl --ca_cert=/var/lib/cloudera-scm-agent/agent-cert/cm-auto-global_cacerts.pem -B --quiet -q"
 #CURL="curl -s --cacert /var/lib/cloudera-scm-agent/agent-cert/cm-auto-global_cacerts.pem --negotiate -u : "

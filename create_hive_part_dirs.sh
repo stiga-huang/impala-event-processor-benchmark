@@ -49,12 +49,15 @@ seq 0 $((NUM_PARTS - 1)) | parallel -j $MAX_THREADS create_dir_and_file "p={}" {
 popd
 
 echo "$(get_ts) Uploading files to ${DB_PATH}/${TBL_NAME}/"
-# This doesn't work if NUM_PARTS > 50000 due to argument list too long.
-# Manually split it into several commands like
-#  hdfs dfs -put -t 32 -l part_400k/p={0..49999} tbl_dir
-#  hdfs dfs -put -t 32 -l part_400k/p={50000..99999} tbl_dir
-#  ...
-hdfs dfs -put -t 32 -l "$TBL_NAME"/p=* "${DB_PATH}/${TBL_NAME}/"
+# Argument list will be too long if uploading more than 50000 dirs.
+# Uploading them in batches.
+export DB_PATH
+export TBL_NAME
+upload_to_hdfs() {
+  hdfs dfs -put -t 32 -l "$@" "${DB_PATH}/${TBL_NAME}/"
+}
+export -f upload_to_hdfs
+find "$TBL_NAME" -name 'p=*' -print0 | xargs -0 -n 50000 bash -c 'upload_to_hdfs "$@"' _
 
 echo "$(get_ts) Done"
 echo "For large NUM_PARTS, mirror files to other tables by distcp, E.g."
