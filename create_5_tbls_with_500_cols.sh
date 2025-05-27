@@ -37,7 +37,7 @@ DATA_TYPES=(
 $IMPALA_SHELL -B --quiet -q "create database if not exists $DB"
 
 echo > $TMP_SQL
-for i in `seq -w $NUM_TABLES`; do
+for i in `seq $NUM_TABLES`; do
   echo "create external table if not exists tbl$i (" >> $TMP_SQL
   for j in {0..499}; do
     data_type=${DATA_TYPES[$((j/25))]}
