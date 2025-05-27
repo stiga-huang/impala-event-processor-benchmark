@@ -38,8 +38,12 @@ create_dir_and_file() {
 export -f generate_filename
 export -f create_dir_and_file
 
-echo "$(get_ts) Fetching table path"
+echo "$(get_ts) Fetching table path of $DB_NAME.$TBL_NAME"
 TBL_PATH=$($IMPALA_SHELL -B --quiet -q "describe formatted $DB_NAME.$TBL_NAME" | grep -i location | awk '{print $2}')
+if [[ "$TBL_PATH" == "" ]]; then
+  echo "Table path not found!"
+  exit 1
+fi
 echo "$(get_ts) Table path: $TBL_PATH"
 
 echo "$(get_ts) Generating local files for $NUM_PARTS partitions using $MAX_THREADS threads"
