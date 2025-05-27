@@ -38,9 +38,9 @@ create_dir_and_file() {
 export -f generate_filename
 export -f create_dir_and_file
 
-echo "$(get_ts) Fetching db path"
-DB_PATH=$($IMPALA_SHELL -B --quiet -q "describe database $DB_NAME" | awk '{print $2}')
-echo "$(get_ts) Db path: $DB_PATH"
+echo "$(get_ts) Fetching table path"
+TBL_PATH=$($IMPALA_SHELL -B --quiet -q "describe formatted $DB_NAME.$TBL_NAME" | grep -i location | awk '{print $2}')
+echo "$(get_ts) Table path: $TBL_PATH"
 
 echo "$(get_ts) Generating local files for $NUM_PARTS partitions using $MAX_THREADS threads"
 mkdir $TBL_NAME
@@ -48,19 +48,18 @@ pushd "$TBL_NAME"
 seq 0 $((NUM_PARTS - 1)) | parallel -j $MAX_THREADS create_dir_and_file "p={}" {}
 popd
 
-echo "$(get_ts) Uploading files to ${DB_PATH}/${TBL_NAME}/"
+echo "$(get_ts) Uploading files to ${TBL_PATH}"
 # Argument list will be too long if uploading more than 50000 dirs.
 # Uploading them in batches.
-export DB_PATH
-export TBL_NAME
+export TBL_PATH
 upload_to_hdfs() {
-  hdfs dfs -put -t 32 -l "$@" "${DB_PATH}/${TBL_NAME}/"
+  hdfs dfs -put -t 32 -l "$@" "${TBL_PATH}/"
 }
 export -f upload_to_hdfs
 find "$TBL_NAME" -name 'p=*' -print0 | xargs -0 -n 50000 bash -c 'upload_to_hdfs "$@"' _
 
 echo "$(get_ts) Done"
 echo "For large NUM_PARTS, mirror files to other tables by distcp, E.g."
-echo "  hadoop distcp -update ${DB_PATH}/${TBL_NAME} ${DB_PATH}/new_tbl"
+echo "  hadoop distcp -update ${TBL_PATH} new_tbl_path"
 echo "For small NUM_PARTS, using HDFS CLI is faster, E.g."
-echo "  hdfs dfs -put -t 32 -l $TBL_NAME/p=* ${DB_PATH}/new_tbl"
+echo "  hdfs dfs -put -t 32 -l $TBL_NAME/p=* new_tbl_path"
