@@ -62,6 +62,12 @@ upload_to_hdfs() {
 export -f upload_to_hdfs
 find "$TBL_NAME" -name 'p=*' -print0 | xargs -0 -n 50000 bash -c 'upload_to_hdfs "$@"' _
 
+TBL_PATH=$($IMPALA_SHELL -B --quiet -q "describe formatted default.src_tbl" | grep -i location | awk '{print $2}')
+echo "$(get_ts) Uploading 1000 dirs to src table: $TBL_PATH"
+hdfs dfs -put -t 32 -l $TBL_NAME/p={0..999} "$TBL_PATH"
+echo "$(get_ts) Adding 1000 partitions in src table"
+$IMPALA_SHELL -B --quiet -q "alter table default.src_tbl recover partitions"
+
 echo "$(get_ts) Done"
 echo "For large NUM_PARTS, mirror files to other tables by distcp, E.g."
 echo "  hadoop distcp -update ${TBL_PATH} new_tbl_path"

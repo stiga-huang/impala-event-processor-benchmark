@@ -53,3 +53,5 @@ for i in `seq $NUM_TABLES`; do
 done 
 
 $IMPALA_SHELL -d $DB -f $TMP_SQL -B --quiet
+# Create the source table for INSERTs
+$IMPALA_SHELL -B --quiet -q "create external table if not exists default.src_tbl like tbl1"

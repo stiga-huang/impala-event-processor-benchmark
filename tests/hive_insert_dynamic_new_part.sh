@@ -7,7 +7,7 @@ procuder() {
   echo "$(get_ts) Impala> Reloading table"
   $IMPALA_EXEC "refresh $DB.$TBL"
   echo "$(get_ts) Hive> Dynamically creating 200 partitions"
-  $HIVE_EXEC "set hive.stats.autogather=false; set hive.exec.max.dynamic.partitions.pernode=200; insert into $DB.$TBL select $COLS, p+400000 from $DB.tbl3 where p<200"
+  $HIVE_EXEC "set hive.stats.autogather=false; set hive.exec.max.dynamic.partitions.pernode=200; insert into $DB.$TBL select $COLS, p+400000 from default.src_tbl where p<200"
 }
 
 consumer_verified() {

@@ -5,7 +5,7 @@ procuder() {
   echo "$(get_ts) Impala> Dropping partition p=500000 in $DB.$TBL"
   $IMPALA_EXEC "alter table $DB.$TBL drop if exists partition(p=500000)"
   echo "$(get_ts) Hive> Adding the new partition by INSERT"
-  SQL="set hive.stats.autogather=false; insert into $DB.$TBL partition(p=500000) select $COLS from $DB.tbl3 where p=999"
+  SQL="set hive.stats.autogather=false; insert into $DB.$TBL partition(p=500000) select $COLS from default.src_tbl where p=0"
   $HIVE_EXEC "$SQL"
 }
 

@@ -5,9 +5,9 @@ procuder() {
   echo "$(get_ts) Hive> Clearing partitions p>=400000"
   $HIVE_EXEC "alter table $DB.$TBL drop if exists partition(p>=400000)"
   echo "$(get_ts) Impala> Resetting partition p=200..399 to have only one row"
-  $IMPALA_EXEC "refresh $DB.$TBL; insert overwrite table $DB.$TBL partition(p) select $COLS,cast(p+200 as int) from $DB.tbl3 where p<200"
+  $IMPALA_EXEC "refresh $DB.$TBL; insert overwrite table $DB.$TBL partition(p) select $COLS,cast(p+200 as int) from default.src_tbl where p<200"
   echo "$(get_ts) Hive> Dynamically inserting 200 new partitions and 200 existing partitions"
-  $HIVE_EXEC "set hive.stats.autogather=false; set hive.exec.max.dynamic.partitions.pernode=400; insert into $DB.$TBL select $COLS, p+200 from $DB.tbl3 where p<200 union all select $COLS, p+400000 from $DB.tbl3 where p<200"
+  $HIVE_EXEC "set hive.stats.autogather=false; set hive.exec.max.dynamic.partitions.pernode=400; insert into $DB.$TBL select $COLS, p+200 from default.src_tbl where p<200 union all select $COLS, p+400000 from default.src_tbl where p<200"
 }
 
 consumer_verified() {

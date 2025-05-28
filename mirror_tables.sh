@@ -5,7 +5,7 @@ set -e
 IMPALA_SHELL=impala-shell.sh
 DB_NAME=scale_40k_500cols_db
 NUM_PARTS=40000
-NUM_TBLS=20
+NUM_TBLS=5
 TBL_NAME_PREFIX=tbl
 
 

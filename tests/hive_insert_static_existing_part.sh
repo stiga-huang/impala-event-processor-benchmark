@@ -3,9 +3,9 @@
 procuder() {
   TBL=${1:-tbl1}
   echo "$(get_ts) Impala> Resetting partition p=1000 to have only one row"
-  $IMPALA_EXEC "insert overwrite table $DB.$TBL partition (p=1000) select $COLS from $DB.tbl3 where p=1001"
+  $IMPALA_EXEC "insert overwrite table $DB.$TBL partition (p=1000) select $COLS from default.src_tbl where p=0"
   echo "$(get_ts) Hive> Adding a new row to the existing partition so it has 2 rows"
-  $HIVE_EXEC "set hive.stats.autogather=false; insert into $DB.$TBL partition(p=1000) select $COLS from $DB.tbl3 where p=1001"
+  $HIVE_EXEC "set hive.stats.autogather=false; insert into $DB.$TBL partition(p=1000) select $COLS from default.src_tbl where p=0"
 }
 
 consumer_verified() {

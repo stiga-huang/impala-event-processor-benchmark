@@ -3,9 +3,9 @@
 procuder() {
   TBL=${1:-tbl1}
   echo "$(get_ts) Impala> Resetting partition p=200..399 to have only one row"
-  $IMPALA_EXEC "insert overwrite table $DB.$TBL partition(p) select $COLS,cast(p+200 as int) from $DB.tbl3 where p<200"
+  $IMPALA_EXEC "insert overwrite table $DB.$TBL partition(p) select $COLS,cast(p+200 as int) from default.src_tbl where p<200"
   echo "$(get_ts) Hive> Dynamically inserting 200 partitions"
-  $HIVE_EXEC "set hive.stats.autogather=false; set hive.exec.max.dynamic.partitions.pernode=200; insert into $DB.$TBL select $COLS, p+200 from $DB.tbl3 where p<200"
+  $HIVE_EXEC "set hive.stats.autogather=false; set hive.exec.max.dynamic.partitions.pernode=200; insert into $DB.$TBL select $COLS, p+200 from default.src_tbl where p<200"
 }
 
 consumer_verified() {
