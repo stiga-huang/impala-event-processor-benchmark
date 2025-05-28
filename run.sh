@@ -45,6 +45,7 @@ start_time=$(date +%s.%3N)
 echo "$(get_ts) Procuder done $start_time"
 
 if [[ "$MANUAL_REFRESH" == "true" ]]; then
+  echo "$(get_ts) Start manual refresh"
   manual_refresh $@
   echo "$(get_ts) Manual refresh finished"
 fi

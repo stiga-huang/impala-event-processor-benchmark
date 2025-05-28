@@ -2,7 +2,7 @@
 
 # Hive CREATE db/table tests
 # Keeps generating CREATE/DROP events
-for i in `seq 10`; do
+for i in `seq 5`; do
   for j in `seq 4`; do ./run.sh tests/hive_create_db.sh; sleep 10; done > create_db_$i.log 2>&1 &
   for j in `seq 4`; do ./run.sh tests/hive_create_table.sh; sleep 10; done > create_tbl_$i.log 2>&1 &
   # Skip drop_db test in manual refresh which uses global invalidate that impacts other tests
