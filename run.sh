@@ -42,7 +42,7 @@ get_ts() {
 procuder $@
 
 start_time=$(date +%s.%3N)
-echo "$(get_ts) Procuder done $start_time"
+echo "$(get_ts) Producer done $start_time"
 
 if [[ "$MANUAL_REFRESH" == "true" ]]; then
   echo "$(get_ts) Start manual refresh"
