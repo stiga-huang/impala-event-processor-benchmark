@@ -5,10 +5,6 @@
 for i in `seq 5`; do
   for j in `seq 4`; do ./run.sh tests/hive_create_db.sh; sleep 10; done > create_db_$i.log 2>&1 &
   for j in `seq 4`; do ./run.sh tests/hive_create_table.sh; sleep 10; done > create_tbl_$i.log 2>&1 &
-  # Skip drop_db test in manual refresh which uses global invalidate that impacts other tests
-  if [[ "$MANUAL_REFRESH" != "true" ]]; then
-    for j in `seq 4`; do ./run.sh tests/hive_drop_db.sh; sleep 10; done > drop_db_$i.log 2>&1 &
-  fi
   for j in `seq 4`; do ./run.sh tests/hive_drop_table.sh; sleep 10; done > drop_tbl_$i.log 2>&1 &
 done
 
@@ -25,7 +21,8 @@ for i in {1..5}; do
   && ./run.sh tests/hive_insert_dynamic_mixed_part.sh tbl$i >> tbl${i}.log 2>&1 \
   && ./run.sh tests/hive_drop_part.sh tbl$i >> tbl${i}.log 2>&1 \
   && ./run.sh tests/hive_add_part.sh tbl$i >> tbl${i}.log 2>&1 \
-  && ./run.sh tests/hive_alter_table.sh tbl$i >> tbl${i}.log 2>&1 &
+  && ./run.sh tests/hive_alter_table.sh tbl$i >> tbl${i}.log 2>&1 \
+  && ./run.sh tests/hive_rename_table.sh tbl$i >> tbl${i}.log 2>&1 &
 done
 
 wait
