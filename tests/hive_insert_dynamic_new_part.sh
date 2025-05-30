@@ -4,8 +4,15 @@ procuder() {
   TBL=${1:-tbl1}
   echo "$(get_ts) Hive> Clearing partitions p>=400000"
   $HIVE_EXEC "alter table $DB.$TBL drop if exists partition(p>=400000)"
-  echo "$(get_ts) Impala> Reloading table"
-  $IMPALA_EXEC "refresh $DB.$TBL"
+  if [[ "$REFRESH_SETUP" == "true" ]]; then
+    echo "$(get_ts) Impala> Refreshing table $DB.$TBL"
+    $IMPALA_EXEC "refresh $DB.$TBL"
+  else
+    # Using INVALIDATE instead of REFRESH to avoid long running DDLs blocking event processing.
+    # Use REFRESH on multiple partitions if the Impala version supports.
+    echo "$(get_ts) Impala> Reloading table $DB.$TBL by INVALIDATE + SELECT"
+    $IMPALA_EXEC "invalidate metadata $DB.$TBL; select count(*) from $DB.$TBL where p=400199"
+  fi
   echo "$(get_ts) Hive> Dynamically creating 200 partitions"
   $HIVE_EXEC "set hive.stats.autogather=false; set hive.exec.max.dynamic.partitions.pernode=200; insert into $DB.$TBL select $COLS, p+400000 from default.src_tbl where p<200"
 }

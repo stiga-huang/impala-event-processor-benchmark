@@ -5,7 +5,16 @@ procuder() {
   echo "$(get_ts) Hive> Clearing partitions p>=400000"
   $HIVE_EXEC "alter table $DB.$TBL drop if exists partition(p>=400000)"
   echo "$(get_ts) Impala> Resetting partition p=200..399 to have only one row"
-  $IMPALA_EXEC "refresh $DB.$TBL; insert overwrite table $DB.$TBL partition(p) select $COLS,cast(p+200 as int) from default.src_tbl where p<200"
+  SQL="insert overwrite table $DB.$TBL partition(p) select $COLS,cast(p+200 as int) from default.src_tbl where p<200"
+  if [[ "$REFRESH_SETUP" == "true" ]]; then
+    echo "$(get_ts) Impala> REFRESH + INSERT OVERWRITE $DB.$TBL"
+    $IMPALA_EXEC "refresh $DB.$TBL; $SQL"
+  else
+    # Using INVALIDATE instead of REFRESH to avoid long running DDLs blocking event processing.
+    # Use REFRESH on multiple partitions if the Impala version supports.
+    echo "$(get_ts) Impala> INVALIDATE + INSERT OVERWRITE $DB.$TBL"
+    $IMPALA_EXEC "invalidate metadata $DB.$TBL; $SQL"
+  fi
   echo "$(get_ts) Hive> Dynamically inserting 200 new partitions and 200 existing partitions"
   $HIVE_EXEC "set hive.stats.autogather=false; set hive.exec.max.dynamic.partitions.pernode=400; insert into $DB.$TBL select $COLS, p+200 from default.src_tbl where p<200 union all select $COLS, p+400000 from default.src_tbl where p<200"
 }
