@@ -28,12 +28,13 @@ sudo yum install -y parallel jq
 
 ## Data Generation
 Edit variables in `create_5_tbls_with_500_cols.sh`. Use it to create partitioned tables with 500 columns.
-`create_hive_part_dirs.sh` creates the partition dirs on HDFS for the first table. You will need
-to manually mirror data to the other tables based on the output.
+`create_hive_part_dirs.sh` creates the partition dirs on HDFS for the first table. `mirror_tables.sh` copies
+data from tbl1 to other tables.
 
 ```bash
 bash create_5_tbls_with_500_cols.sh
 bash create_hive_part_dirs.sh
+bash mirror_tables.sh
 ```
 
 ## Benchmark Scenarios
@@ -51,9 +52,7 @@ These are common scenarios in daily/weekly jobs.
   * Insert into both existing and new partitions
 * Hive add/drop partitions
 * Hive alter table changing tblproperties
-* Hive creates temp table + rename it to prod table after dropping the prod table
-  * CreateTableAsSelect
-  * CreateTable + Insert
+* Hive rename table
 
 ## Usage
 
