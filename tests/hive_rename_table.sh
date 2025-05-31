@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export URL_PATH="/catalog_object?json&object_type=TABLE&object_name="
+export URL_PATH="/table_metrics?json&name="
 
 procuder() {
   TBL=${1:-tbl1}
@@ -12,7 +12,7 @@ consumer_verified() {
   TBL=${1:-tbl1}
   TBL_NAME=$DB.$TBL
   set -x
-  if $CURL "${CATALOG_URL}${URL_PATH}${TBL_NAME}" | jq -e ".json_string" > /dev/null; then
+  if $CURL "${CATALOG_URL}${URL_PATH}${TBL_NAME}" | jq -e ".table_metrics" > /dev/null; then
     set +x
     echo "$(get_ts) ${TBL_NAME} still exists"
     sleep 0.01
@@ -21,7 +21,7 @@ consumer_verified() {
   echo "$(get_ts) ${TBL_NAME} removed"
   TBL_NAME=${TBL_NAME}_tmp
   set -x
-  if $CURL "${CATALOG_URL}${URL_PATH}${TBL_NAME}" | jq -e ".json_string" > /dev/null; then
+  if $CURL "${CATALOG_URL}${URL_PATH}${TBL_NAME}" | jq -e ".table_metrics" > /dev/null; then
     set +x
     echo "$(get_ts) Found $TBL_NAME"
     sleep 0.01
