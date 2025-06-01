@@ -36,7 +36,7 @@ TEST_CASE=$1
 shift
 
 get_ts() {
-  date '+%Y-%m-%d %H:%M:%S.%N'
+  echo "[$(hostname)] $(date '+%Y-%m-%d %H:%M:%S.%N')"
 }
 
 procuder $@
