@@ -11,7 +11,7 @@ done
 # Hive INSERT/ALTER/RENAME table tests. Run them distributedly across all servers.
 #  -j4 specifies 4 jobs to run in parallel on a node
 #  {1..20} specifies the table indexes are 1 to 20
-parallel --sshloginfile servers.txt -j4 --keep-order 'bash table_job.sh {}' ::: {1..20} > all_tbl.log 2>all_tbl.err
+parallel --sshloginfile servers.txt -j4 --keep-order "export MANUAL_REFRESH=$MANUAL_REFRESH; bash table_job.sh {}" ::: {1..20} > all_tbl.log 2>all_tbl.err
 
 grep -h '>>>>>>>>>>' create*.log drop*.log all_tbl.log | sort
 
