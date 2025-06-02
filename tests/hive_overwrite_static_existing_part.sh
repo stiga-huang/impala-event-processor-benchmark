@@ -2,7 +2,7 @@
 
 procuder() {
   TBL=${1:-tbl1}
-  echo "$(get_ts) Impala> Adding a new row to the existing partition so it has more than one row"
+  echo "$(get_ts) Impala> Adding a new row to the existing partition (p=0) of $DB.$TBL so it has more than one row"
   $IMPALA_EXEC "insert into $DB.$TBL partition(p=1000) select $COLS from default.src_tbl where p=0"
   echo "$(get_ts) Hive> Resetting the partition to have only one row"
   $HIVE_EXEC "set hive.stats.autogather=false; insert overwrite table $DB.$TBL partition (p=1000) select $COLS from default.src_tbl where p=0"
