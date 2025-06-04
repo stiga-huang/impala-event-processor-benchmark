@@ -13,6 +13,8 @@ done
 #  {1..20} specifies the table indexes are 1 to 20
 parallel --sshloginfile servers.txt -j4 --keep-order "export MANUAL_REFRESH=$MANUAL_REFRESH; bash table_job.sh {}" ::: {1..20} > all_tbl.log 2>all_tbl.err
 
+wait
+
 grep -h '>>>>>>>>>>' create*.log drop*.log all_tbl.log | sort
 
 # Somehow the terminal is messed up. Recover it anyway.

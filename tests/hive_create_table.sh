@@ -32,8 +32,9 @@ consumer_verified_old() {
 consumer_verified() {
   for i in `seq $NUM_TABLES`; do
     TBL_NAME="${TBL_NAME_PREFIX}_${i}"
+    # Old versions of Impala have key 'thrift_json'. Newer versions have 'json_string'.
     set -x
-    if ! $CURL "${CATALOG_URL}${URL_PATH}${TBL_NAME}" | jq -e ".json_string"; then
+    if ! $CURL "${CATALOG_URL}${URL_PATH}${TBL_NAME}" | jq -e ".json_string // .thrift_string"; then
       set +x
       echo "$(get_ts) ${TBL_NAME} not found"
       sleep 0.01

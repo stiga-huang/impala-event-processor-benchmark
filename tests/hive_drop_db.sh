@@ -37,8 +37,9 @@ manual_refresh() {
 
 consumer_verified() {
   for i in `seq $NUM_DBS`; do
+    # Old versions of Impala have key 'thrift_json'. Newer versions have 'json_string'.
     set -x
-    if $CURL "${CATALOG_URL}${URL_PATH}${DB_PREFIX}${i}" | jq -e ".json_string"; then
+    if $CURL "${CATALOG_URL}${URL_PATH}${DB_PREFIX}${i}" | jq -e ".json_string // .thrift_string"; then
       set +x
       echo "$(get_ts) ${DB_PREFIX}${i} still exists"
       sleep 0.01
